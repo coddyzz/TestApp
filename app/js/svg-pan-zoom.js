@@ -1408,8 +1408,8 @@ module.exports = {
 , setCTM: function(element, matrix, defs) {
     var that = this
       , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-    console.log(s,element);
-    console.log("scroll");
+    // console.log(s,element);
+    // console.log("scroll");
     element.setAttributeNS(null, 'transform', s);
     if ('transform' in element.style) {
       element.style.transform = s;

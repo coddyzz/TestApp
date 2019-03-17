@@ -341,7 +341,8 @@
 </head>
 
 <body>
-    <div id="optionX" class="ui-widget-content">
+    <div id="optionX" class="ui-wid
+    -content">
         <div id="closeX"></div>
         <p>X Axis</p>
         <input type="text" id="amountX" readonly style="border:0; color:#f6931f; font-weight:bold;">
@@ -405,6 +406,7 @@
         <label class="form-check-label">
             <input class="form-check-input" id="explorerOpt" type="checkbox" value="" checked> Show Explorer
         </label>
+<!--         <p><label for="zoom-rect"><input type="checkbox" id="zoom-rect"> zoom by rectangle</label> -->
     </div>
 
     <div id="helloTree"> </div>
@@ -507,6 +509,7 @@
                         variableListType[name] = "text";
                     }
                 }
+                //console.log(data[i])
                 //console.log(dataRow)
                 //also add image Information
                 dataRow['image'] = data[i].data.image;
@@ -514,6 +517,8 @@
                 dataRow['created_by'] = data[i].created_by;
                 var date = new Date(data[i].created_on);
                 dataRow['created_on'] = date.getTime();
+
+                
                 if (data[i].rate == undefined)
                     dataRow['rate'] = 0; //voting
                 else {
@@ -529,8 +534,20 @@
                 } else {
                     dataRow['isChild'] = false;
                 }
+
+                
+                var found = cleanData.find(function(element) {
+                    return element._id == data[i].parent;
+                });
+                // if(typeof(found) === "object"){
+                //     delete found['parent']}
+               //console.log(typeof(found))
+                dataRow['parent'] = found
+                
+
                 cleanData.push(dataRow);
             }
+
             console.log(cleanData);
             //add default variable list: created_on and created_by
             variableList.push('created_on')
@@ -786,6 +803,51 @@
                 .style("fill-opacity", 1) // set to 1e-6 to hide
                 .on("mouseover", tipMouseover)
                 .on("mouseout", tipMouseout);
+
+            node.enter()
+                .append("line")
+                .attr("x1",function(d){
+                    //console.log("x1: "+currXScale(d[selectedX]))
+                    return currXScale(d[selectedX])
+                })
+                .attr("y1",function(d){
+                    //console.log("y1: "+d[selectedY])
+                    return currYScale(d[selectedY])
+                })
+                .attr("x2",function(d){
+                    if(typeof(d.parent) === "object"){
+                        //console.log(d)
+                        //console.log("x0: " + currXScale(d.parent[selectedX]))
+                        return currXScale(d.parent[selectedX])}
+                })
+                .attr("y2",function(d){
+                    if(typeof(d.parent) === "object"){
+                        console.log("y0: " + currXScale(d.parent[selectedY]))
+                        return currYScale(d.parent[selectedY])}
+                })
+                .style("stroke-width",2)
+                .style("stroke","blue")
+
+            node2.enter()
+                .append("line")
+                .attr("x1",function(d){
+                    //console.log(currXScale(d[selectedX]))
+                    return currXScale(d[selectedX])
+                })
+                .attr("y1",function(d){
+                    //console.log(currYScale(d[selectedY]))
+                    return currYScale(d[selectedY])
+                })
+                .attr("x2",function(d){
+                    if(typeof(d.parent) === "object"){
+                        return currXScale(d.parent[selectedX])}
+                })
+                .attr("y2",function(d){
+                    if(typeof(d.parent) === "object"){
+                        return currYScale(d.parent[selectedY])}
+                })
+                .style("stroke-width",1)
+                .style("stroke","blue")            
 
             function tick(e) {
                 //console.log(e)
@@ -1366,6 +1428,28 @@
                         return "hidden";
                     }
                 })
+
+            svg.selectAll("line")
+                //.data(cleanData)  // Update with new data
+                .transition() // Transition from old to new
+                .duration(100) // Length of animation
+                .ease("linear") // Transition easing - default 'variable' (i.e. has acceleration), also: 'circle', 'elastic', 'bounce', 'linear'
+                .attr("x2", function(d) {
+                    if(typeof(d.parent) === "object"){
+                        return d.parent.x}
+                })
+                .attr("x1", function(d) {
+                    return d.x;
+                })
+                .attr("y2", function(d) {
+                    if(typeof(d.parent) === "object"){
+                        return d.parent.y}
+                })
+                .attr("y1", function(d) {
+                    //console.log(d.y);
+                    return d.y;
+                })
+
             svg.selectAll("image")
                 //.attr("href", function(d) { return d.image; })
                 .transition() // Transition from old to new
@@ -1496,6 +1580,28 @@
                         return "hidden";
                     }
                 })
+            svg2.selectAll("line")
+                //.data(cleanData)  // Update with new data
+                .transition() // Transition from old to new
+                .duration(100) // Length of animation
+                .ease("linear") // Transition easing - default 'variable' (i.e. has acceleration), also: 'circle', 'elastic', 'bounce', 'linear'
+                .attr("x2", function(d) {
+                    if(typeof(d.parent) === "object"){
+                        return d.parent.x}
+                })
+                .attr("x1", function(d) {
+                    return d.x;
+                })
+                .attr("y2", function(d) {
+                    if(typeof(d.parent) === "object"){
+                        return d.parent.y}
+                })
+                .attr("y1", function(d) {
+                    //console.log(d.y);
+                    return d.y;
+                })
+
+
 
         }
         var showLegend = true;
